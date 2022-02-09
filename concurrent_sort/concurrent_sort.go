@@ -14,20 +14,17 @@ package main
 import (
 	"fmt"
 	"sort"
-	"sync"
 )
 
 func main() {
 	input := getInput()
 	chunckedSlices := chunkSlice(input, 4)
-	var wg sync.WaitGroup
 	c := make(chan []int, 4)
-	wg.Add(4)
-	go sortSlice(chunckedSlices[0], c, &wg)
-	go sortSlice(chunckedSlices[1], c, &wg)
-	go sortSlice(chunckedSlices[2], c, &wg)
-	go sortSlice(chunckedSlices[3], c, &wg)
-	wg.Wait()
+
+	go sortSlice(0, chunckedSlices[0], c)
+	go sortSlice(1, chunckedSlices[1], c)
+	go sortSlice(2, chunckedSlices[2], c)
+	go sortSlice(3, chunckedSlices[3], c)
 	arr1 := make([]int, 0, len(input)/2)
 	arr2 := make([]int, 0, len(input)/2)
 	finalArr := make([]int, 0)
@@ -63,11 +60,10 @@ func merge(l []int, r []int, ans *[]int) {
 	}
 }
 
-func sortSlice(ints []int, c chan []int, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func sortSlice(id int, ints []int, c chan []int) {
+	fmt.Println("Unsorted goroutine ", id, ints)
 	sort.Ints(ints)
-	fmt.Println("Sorted goroutine arr:", ints)
+	fmt.Println("Sorted goroutine", id, ints)
 	c <- ints
 }
 
